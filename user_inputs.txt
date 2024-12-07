@@ -1,0 +1,4 @@
+Total Tickets: 10
+Tickets Released Per Cycle: 2
+Tickets Retrieved Per Cycle: 3
+Maximum Ticket Pool Capacity: 15
