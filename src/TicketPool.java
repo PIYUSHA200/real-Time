@@ -1,44 +1,49 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class TicketPool {
-    private final List<Integer> tickets = Collections.synchronizedList(new ArrayList<>());
-    private final int maxCapacity;
+    private int maxTicketCapacity;
+    private Queue<Integer> tickets; // A queue to represent the tickets in the pool
 
-    public TicketPool(int maxCapacity) {
-        this.maxCapacity = maxCapacity;
+    public TicketPool(int maxTicketCapacity, int totalTickets) {
+        this.maxTicketCapacity = maxTicketCapacity;
+        this.tickets = new LinkedList<>();
+
+        // Initialize the tickets in the pool
+        for (int i = 1; i <= totalTickets; i++) {
+            tickets.add(i);
+        }
     }
 
-    // Add tickets to the pool
-    public synchronized void addTickets(int count) {
-        while (tickets.size() + count > maxCapacity) {
-            try {
-                System.out.println("Vendor waiting: Pool is full.");
-                wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+    public synchronized void addTickets(int ticketsToAdd) {
+        int added = 0;
+        while (added < ticketsToAdd && tickets.size() < maxTicketCapacity) {
+            tickets.add(tickets.size() + 1); // Add new ticket to the pool
+            added++;
         }
-        for (int i = 0; i < count; i++) {
-            tickets.add(1); // Add a ticket
-        }
-        System.out.println("Added " + count + " tickets. Total tickets: " + tickets.size());
-        notifyAll();
+
+        System.out.println("Vendor " + Thread.currentThread().getName() + " added " + added + " ticket(s). Total tickets: " + tickets.size());
+        notifyAll(); // Notify waiting threads
     }
 
-    // Remove tickets from the pool
-    public synchronized void removeTicket() {
-        while (tickets.isEmpty()) {
+    public synchronized void purchaseTickets(int ticketsToPurchase) {
+        // Ensure that the customer only purchases the exact number of tickets requested
+        while (tickets.size() < ticketsToPurchase) {
             try {
-                System.out.println("Customer waiting: No tickets available.");
-                wait();
+                wait(); // Wait for tickets to be added
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
+                return;
             }
         }
-        tickets.remove(0); // Remove a ticket
-        System.out.println("Ticket purchased. Remaining tickets: " + tickets.size());
-        notifyAll();
+
+        // Keep track of the tickets the customer buys
+        StringBuilder purchasedTickets = new StringBuilder();
+        for (int i = 0; i < ticketsToPurchase; i++) {
+            int ticket = tickets.poll(); // Remove a ticket from the pool
+            purchasedTickets.append(ticket).append(" ");
+        }
+
+        System.out.println(Thread.currentThread().getName() + " purchased " + ticketsToPurchase + " ticket(s). Purchased tickets id: " + purchasedTickets.toString().trim() + ". Remaining tickets: " + tickets.size());
     }
 }
