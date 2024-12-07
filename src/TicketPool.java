@@ -22,7 +22,7 @@ public class TicketPool {
             added++;
         }
 
-        System.out.println("Vendor " + Thread.currentThread().getName() + " added " + added + " ticket(s). Total tickets: " + tickets.size());
+        System.out.println("Vendor" + " added " + added + " tickets. Total tickets: " + tickets.size());
         notifyAll(); // Notify waiting threads
     }
 
@@ -44,6 +44,6 @@ public class TicketPool {
             purchasedTickets.append(ticket).append(" ");
         }
 
-        System.out.println(Thread.currentThread().getName() + " purchased " + ticketsToPurchase + " ticket(s). Purchased tickets id: " + purchasedTickets.toString().trim() + ". Remaining tickets: " + tickets.size());
+        System.out.println(Thread.currentThread().getName() + " purchased " + ticketsToPurchase + " tickets. Purchased tickets id: " + purchasedTickets.toString().trim() + ". Remaining tickets: " + tickets.size());
     }
 }
